@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Устуу-Хурээ — учебный тест</title>
+<style>
+:root{--navy:#101827;--red:#a51d2d;--bg:#eef1f5;--card:#fff;--text:#172033;--muted:#6b7280}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Arial,system-ui,sans-serif;color:var(--text)}
+header{background:linear-gradient(135deg,#0d1420,#202b3d);color:#fff;padding:22px 18px 26px;border-bottom:4px solid var(--red)}
+.wrap{max-width:760px;margin:auto}.brand{display:flex;align-items:center;gap:12px}.emblem{width:42px;height:42px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;font-weight:700}.brand b{font-size:15px}.brand span{display:block;color:#cbd5e1;font-size:12px;margin-top:3px}
+h1{font-size:25px;margin:25px 0 8px} .subtitle{color:#d1d5db;font-size:14px}
+main{padding:18px 14px 40px}.card{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 4px 18px #1111;margin-bottom:14px}
+label{font-size:14px;font-weight:700;display:block;margin-bottom:7px}input{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+button{width:100%;border:0;border-radius:11px;padding:15px;font-size:16px;font-weight:700;background:var(--red);color:white;cursor:pointer}.secondary{background:var(--navy)}
+.hidden{display:none}.progress{height:8px;background:#dbe1e8;border-radius:8px;overflow:hidden;margin:12px 0 20px}.bar{height:100%;background:var(--red);width:0;transition:.25s}
+.qnum{font-size:13px;color:var(--muted);font-weight:700}.question{font-size:19px;line-height:1.35;margin:8px 0 17px;font-weight:700}
+.option{display:block;border:1px solid #d4d9e0;border-radius:11px;padding:13px;margin:9px 0;cursor:pointer;font-weight:500}
+.option input{width:auto;margin-right:8px}.option:has(input:checked){border-color:var(--red);background:#fff3f4}
+.actions{display:flex;gap:10px;margin-top:18px}.actions button{flex:1}
+.result{text-align:center}.score{font-size:46px;font-weight:800;color:var(--red);margin:10px}.small{font-size:13px;color:var(--muted);line-height:1.5}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#f2d7db;color:#7e1422;font-size:12px;font-weight:700}
+footer{text-align:center;color:#7b8492;font-size:11px;padding:10px 20px 30px}
+@media(max-width:480px){h1{font-size:22px}.card{padding:16px}.question{font-size:17px}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+  <div class="brand"><div class="emblem">УХ</div><div><b>УЧЕБНЫЙ ТЕСТ</b><span>История и культурное наследие Тувы</span></div></div>
+  <h1>Устуу-Хурээ</h1>
+  <div class="subtitle">20 вопросов · без регистрации · только ФИО</div>
+</div>
+</header>
+
+<main class="wrap">
+<section id="start" class="card">
+  <span class="badge">НАЧАЛО ТЕСТИРОВАНИЯ</span>
+  <h2>Введите ФИО</h2>
+  <label for="fio">Фамилия, имя, отчество</label>
+  <input id="fio" autocomplete="name" placeholder="Например: Иванов Иван Иванович">
+  <p class="small">Данные используются только для отображения результата на этом устройстве и никуда не отправляются.</p>
+  <button onclick="startTest()">Начать тест</button>
+</section>
+
+<section id="test" class="hidden">
+  <div class="card">
+    <div class="qnum" id="qnum"></div><div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="question" id="question"></div><div id="options"></div>
+    <div class="actions"><button class="secondary" onclick="prevQ()" id="prev">Назад</button><button onclick="nextQ()" id="next">Далее</button></div>
+  </div>
+</section>
+
+<section id="result" class="hidden card result">
+  <span class="badge">ТЕСТ ЗАВЕРШЁН</span>
+  <h2 id="resultName"></h2>
+  <div class="score" id="score"></div>
+  <p id="resultText"></p>
+  <button onclick="location.reload()">Пройти заново</button>
+</section>
+</main>
+<footer>Учебный неофициальный сайт. Не является ресурсом Следственного комитета Российской Федерации.</footer>
+
+<script>
+const questions = [
+["В каком году началось строительство Устуу-Хурээ?",["1900","1905","1914","1930"],1],
+["Когда строительство первоначального храма было завершено?",["1905","1906","1907","1910"],2],
+["Кто был инициатором строительства Устуу-Хурээ?",["Хайдып","Буян-Бадыргы","Салчак Тока","Кунан-Тонме"],0],
+["Кто руководил проектом и строительством храма?",["Игорь Дулуш","Кунтан Римпоче","Сергей Шойгу","Роберт Турман"],1],
+["В каком городе находится Устуу-Хурээ?",["Кызыл","Чадан","Ак-Довурак","Шагонар"],1],
+["В каком урочище расположен храм?",["Чайлаг-Алаак","Пор-Бажын","Элегест","Тос-Булак"],0],
+["На каком берегу реки Чадан расположен Устуу-Хурээ?",["На левом","На правом","На обоих","Далеко от реки"],1],
+["Какой архитектурной традиции относится первоначальный проект храма?",["Только русской","Тибетской","Готической","Древнеримской"],1],
+["Какие мастера также участвовали в строительстве первоначального храма?",["Итальянские","Китайские","Французские","Японские"],1],
+["Почему часть старых стен сохранилась после разрушения комплекса?",["Они были деревянными","Они были глинобитными","Их перенесли","Их построили заново"],1],
+["В каком десятилетии храм был закрыт?",["1910-х","1920-х","1930-х","1950-х"],2],
+["В каком году было принято решение о разрушении главного храма — Цогчена?",["1929","1937","1945","1956"],1],
+["Что произошло с ламами Устуу-Хурээ в период репрессий?",["Они все переехали","Они были репрессированы, часть расстреляна","Они стали музыкантами","Они продолжили работу открыто"],1],
+["В каком году Правительство России приняло решение о восстановлении Устуу-Хурээ?",["1983","1991","1999","2008"],2],
+["В каком году началось современное восстановление храма?",["1999","2004","2008","2012"],2],
+["В каком году состоялось торжественное открытие восстановленного храма?",["2008","2010","2012","2019"],2],
+["Что решили сделать со стенами старого разрушенного храма?",["Полностью снести","Оставить как памятник и возвести новый храм рядом","Перевезти в Кызыл","Залить бетоном"],1],
+["Когда впервые прошёл фестиваль «Устуу-Хурээ»?",["1983","1999","2008","2012"],1],
+["Кто выступил инициатором фестиваля «Устуу-Хурээ»?",["Игорь Дулуш","Кунтан Римпоче","Вилли Хаславская","Сергей Шойгу"],0],
+["Какой смысл наиболее точно отражает современный фестиваль «Устуу-Хурээ»?",["Только спортивные соревнования","Фестиваль живой музыки и веры, связанный с возрождением храма","Военный парад","Торговая ярмарка"],1]
+];
+
+let current=0, answers=Array(questions.length).fill(null), fio="";
+function startTest(){
+ fio=document.getElementById("fio").value.trim();
+ if(!fio){alert("Введите ФИО.");return}
+ document.getElementById("start").classList.add("hidden");
+ document.getElementById("test").classList.remove("hidden");
+ render();
+}
+function render(){
+ const q=questions[current];
+ document.getElementById("qnum").textContent=`Вопрос ${current+1} из ${questions.length}`;
+ document.getElementById("bar").style.width=((current+1)/questions.length*100)+"%";
+ document.getElementById("question").textContent=q[0];
+ document.getElementById("options").innerHTML=q[1].map((x,i)=>`<label class="option"><input type="radio" name="ans" value="${i}" ${answers[current]===i?"checked":""}>${String.fromCharCode(65+i)}. ${x}</label>`).join("");
+ document.getElementById("prev").disabled=current===0;
+ document.getElementById("next").textContent=current===questions.length-1?"Завершить":"Далее";
+}
+function save(){const c=document.querySelector('input[name="ans"]:checked'); if(c) answers[current]=+c.value;}
+function nextQ(){save(); if(answers[current]===null){alert("Выберите ответ.");return} if(current<questions.length-1){current++;render()}else finish();}
+function prevQ(){save();if(current>0){current--;render()}}
+function finish(){
+ let score=answers.reduce((s,a,i)=>s+(a===questions[i][2]?1:0),0);
+ document.getElementById("test").classList.add("hidden");
+ document.getElementById("result").classList.remove("hidden");
+ document.getElementById("resultName").textContent=fio;
+ document.getElementById("score").textContent=`${score} / ${questions.length}`;
+ document.getElementById("resultText").textContent=score>=18?"Отличный результат!":score>=14?"Хороший результат.":"Рекомендуется повторить материал об истории Устуу-Хурээ.";
+}
+</script>
+</body>
+</html>
